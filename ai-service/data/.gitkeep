@@ -1,0 +1,5 @@
+# data/
+# Phase 1+: Store training datasets and processed data files here.
+# Do NOT commit sensitive or large datasets to version control.
+# Use .gitignore to exclude *.csv, *.json data files if needed.
+.gitkeep

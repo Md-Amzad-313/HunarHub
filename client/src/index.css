@@ -1,0 +1,96 @@
+/* src/index.css
+ * Global styles – Tailwind directives + base resets.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base resets ─────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-900 font-sans antialiased;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  a {
+    @apply text-primary-500 hover:text-primary-600 transition-colors duration-200;
+  }
+
+  img, video {
+    max-width: 100%;
+    display: block;
+  }
+
+  input, button, textarea, select {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+/* ── Reusable component classes ──────────────────────────── */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-400;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary-500 text-white hover:bg-secondary-600 focus:ring-secondary-400;
+  }
+
+  .btn-outline {
+    @apply btn border border-primary-500 text-primary-600 hover:bg-primary-50 focus:ring-primary-400;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-card p-6;
+  }
+
+  .section-title {
+    @apply text-2xl sm:text-3xl font-heading font-bold text-neutral-900;
+  }
+
+  .section-subtitle {
+    @apply text-neutral-600 mt-2 text-base sm:text-lg;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* ── Utilities ───────────────────────────────────────────── */
+@layer utilities {
+  .gradient-brand {
+    background: linear-gradient(135deg, #f7a020 0%, #e68f18 100%);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #f7a020, #347de0);
+  }
+}
