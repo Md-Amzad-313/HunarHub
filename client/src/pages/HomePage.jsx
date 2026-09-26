@@ -1,234 +1,226 @@
-/**
- * HomePage.jsx
- * HunarHub landing page – Phase 0 foundation.
- * Contains: Hero, Features, How-It-Works, CTA sections.
- * Marketplace/product listings will be added in Phase 1.
- */
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-import React from 'react';
+import CategoryCard from '../components/cards/CategoryCard';
+import ProductCard from '../components/cards/ProductCard';
+import ServiceCard from '../components/cards/ServiceCard';
+import EntrepreneurCard from '../components/cards/EntrepreneurCard';
+import SearchBar from '../components/common/SearchBar';
 
-/* ── Data ────────────────────────────────────────────────── */
-const FEATURES = [
-  {
-    icon: '🏪',
-    title: 'Digital Storefront',
-    description:
-      'Micro-entrepreneurs can showcase their products and services with a professional online presence.',
-  },
-  {
-    icon: '🤝',
-    title: 'Direct Connection',
-    description:
-      'Customers connect directly with local artisans, craftsmen, and service providers in their community.',
-  },
-  {
-    icon: '📱',
-    title: 'Mobile-First',
-    description:
-      'Optimised for smartphones so entrepreneurs can manage their business on the go.',
-  },
-  {
-    icon: '🤖',
-    title: 'AI Recommendations',
-    description:
-      'Smart product and service recommendations powered by machine learning. (Coming soon)',
-  },
-  {
-    icon: '🔒',
-    title: 'Secure Payments',
-    description:
-      'Transactions secured with industry-standard encryption and authentication.',
-  },
-  {
-    icon: '⭐',
-    title: 'Reviews & Ratings',
-    description:
-      'Build trust through transparent customer reviews and a star-rating system.',
-  },
-];
+import { CATEGORIES } from '../data/categories';
+import { PRODUCTS } from '../data/products';
+import { SERVICES } from '../data/services';
+import { ENTREPRENEURS } from '../data/entrepreneurs';
 
-const HOW_IT_WORKS = [
-  {
-    step: '01',
-    role: 'Entrepreneurs',
-    title: 'Create Your Profile',
-    description: 'Register as a micro-entrepreneur and set up your digital storefront in minutes.',
-  },
-  {
-    step: '02',
-    role: 'Entrepreneurs',
-    title: 'List Products & Services',
-    description: 'Add your offerings with photos, descriptions, and pricing.',
-  },
-  {
-    step: '03',
-    role: 'Customers',
-    title: 'Discover & Order',
-    description: 'Browse the marketplace and place orders directly from local entrepreneurs.',
-  },
-  {
-    step: '04',
-    role: 'Both',
-    title: 'Grow Together',
-    description: 'Track orders, manage requests, and build lasting customer relationships.',
-  },
-];
-
-/* ── Sub-components ──────────────────────────────────────── */
-function HeroSection() {
-  return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary-500 via-primary-400 to-secondary-500 text-white">
-      {/* Decorative background blobs */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white blur-3xl" />
-        <div className="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-white blur-3xl" />
-      </div>
-
-      <div className="container-custom relative py-24 sm:py-32">
-        <div className="max-w-3xl mx-auto text-center">
-          <span className="inline-block bg-white/20 text-white text-xs font-semibold px-4 py-1.5 rounded-full mb-6 tracking-wider uppercase">
-            🚀 Phase 0 – Foundation
-          </span>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold leading-tight">
-            Empowering Local{' '}
-            <span className="underline decoration-white/60 decoration-4">
-              Micro-Entrepreneurs
-            </span>
-          </h1>
-          <p className="mt-6 text-lg sm:text-xl text-white/90 leading-relaxed max-w-2xl mx-auto">
-            HunarHub is a digital marketplace connecting skilled local entrepreneurs
-            with customers — helping traditional crafts and services thrive in the
-            digital economy.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="btn bg-white text-primary-600 hover:bg-neutral-100 focus:ring-white text-base px-8 py-3">
-              Start Selling
-            </button>
-            <button className="btn border border-white/60 text-white hover:bg-white/10 text-base px-8 py-3">
-              Explore Marketplace
-            </button>
-          </div>
-          <p className="mt-6 text-sm text-white/70">
-            Full marketplace launching soon — marketplace features are in development.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FeaturesSection() {
-  return (
-    <section className="py-20 bg-white">
-      <div className="container-custom">
-        <div className="text-center mb-14">
-          <h2 className="section-title">Why HunarHub?</h2>
-          <p className="section-subtitle max-w-2xl mx-auto">
-            A purpose-built platform that makes it easy for local entrepreneurs to
-            grow their business and for customers to discover unique local talent.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURES.map(({ icon, title, description }) => (
-            <div key={title} className="card hover:shadow-card-hover transition-shadow duration-300">
-              <span className="text-4xl">{icon}</span>
-              <h3 className="mt-4 text-lg font-heading font-semibold text-neutral-900">{title}</h3>
-              <p className="mt-2 text-sm text-neutral-600 leading-relaxed">{description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HowItWorksSection() {
-  return (
-    <section className="py-20 bg-neutral-50">
-      <div className="container-custom">
-        <div className="text-center mb-14">
-          <h2 className="section-title">How It Works</h2>
-          <p className="section-subtitle max-w-2xl mx-auto">
-            Simple steps to get started — whether you're an entrepreneur or a customer.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {HOW_IT_WORKS.map(({ step, role, title, description }) => (
-            <div key={step} className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-2xl gradient-brand flex items-center justify-center text-white text-2xl font-heading font-bold shadow-md">
-                {step}
-              </div>
-              <span className="mt-4 text-xs font-semibold text-primary-500 uppercase tracking-wider">
-                {role}
-              </span>
-              <h3 className="mt-1 text-base font-heading font-semibold text-neutral-900">{title}</h3>
-              <p className="mt-2 text-sm text-neutral-600 leading-relaxed">{description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function StatsSection() {
-  return (
-    <section className="py-16 bg-primary-500 text-white">
-      <div className="container-custom">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-          {[
-            { value: '—', label: 'Entrepreneurs' },
-            { value: '—', label: 'Products Listed' },
-            { value: '—', label: 'Happy Customers' },
-            { value: '—', label: 'Cities Covered' },
-          ].map(({ value, label }) => (
-            <div key={label}>
-              <p className="text-3xl sm:text-4xl font-heading font-bold">{value}</p>
-              <p className="mt-1 text-sm text-white/80">{label}</p>
-            </div>
-          ))}
-        </div>
-        <p className="text-center text-white/60 text-xs mt-6">
-          Live statistics will be displayed once the marketplace launches.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-function CtaSection() {
-  return (
-    <section className="py-20 bg-white">
-      <div className="container-custom">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="section-title">Ready to Get Started?</h2>
-          <p className="section-subtitle max-w-xl mx-auto">
-            Join HunarHub and be part of the movement to empower local micro-entrepreneurs.
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="btn-primary text-base px-8 py-3">
-              Join as Entrepreneur
-            </button>
-            <button className="btn-outline text-base px-8 py-3">
-              Shop as Customer
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── Page ────────────────────────────────────────────────── */
 function HomePage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (query) => {
+    if (query.trim()) {
+      navigate(`/explore?search=${encodeURIComponent(query)}`);
+    } else {
+      navigate('/explore');
+    }
+  };
+
   return (
-    <>
-      <HeroSection />
-      <FeaturesSection />
-      <HowItWorksSection />
-      <StatsSection />
-      <CtaSection />
-    </>
+    <div className="space-y-16 pb-16">
+      {/* ── 1. HERO SECTION ───────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 text-white py-20 sm:py-28">
+        <div className="absolute inset-0 opacity-15 pointer-events-none">
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-primary-500 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-secondary-500 blur-3xl" />
+        </div>
+
+        <div className="container-custom relative z-10">
+          <div className="max-w-3xl mx-auto text-center">
+            <span className="inline-block bg-primary-500/20 text-primary-300 text-xs font-semibold px-4 py-1.5 rounded-full mb-6 border border-primary-500/30">
+              🌾 Digital Marketplace for Local Micro-Entrepreneurs
+            </span>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold leading-tight">
+              Discover Local Skills.{' '}
+              <span className="text-gradient">Support Local Talent.</span>
+            </h1>
+
+            <p className="mt-6 text-base sm:text-lg text-neutral-300 leading-relaxed max-w-2xl mx-auto">
+              HunarHub empowers artisans, tailors, bakers, and local service providers by providing a direct digital storefront to reach customers across your city.
+            </p>
+
+            {/* Hero Search Bar */}
+            <div className="mt-8 max-w-xl mx-auto">
+              <SearchBar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onSearch={handleSearch}
+                placeholder="Search pottery, tailoring, baking, repairs..."
+                buttonLabel="Discover Talent"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-8 flex flex-wrap gap-4 justify-center">
+              <Link to="/explore" className="btn-primary text-sm px-6 py-3 no-underline">
+                Explore Marketplace
+              </Link>
+              <Link to="/entrepreneur" className="btn-outline border-white text-white hover:bg-white/10 text-sm px-6 py-3 no-underline">
+                Become an Entrepreneur
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 2. FEATURED CATEGORIES ───────────────────────────── */}
+      <section className="container-custom">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+          <div>
+            <h2 className="section-title">Explore Categories</h2>
+            <p className="section-subtitle">Find traditional skills and daily services right in your neighborhood.</p>
+          </div>
+          <Link to="/categories" className="text-sm font-semibold text-primary-600 hover:text-primary-700 no-underline flex items-center gap-1">
+            View All Categories →
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {CATEGORIES.slice(0, 6).map((category) => (
+            <CategoryCard key={category.id} category={category} />
+          ))}
+        </div>
+      </section>
+
+      {/* ── 3. FEATURED ENTREPRENEURS ──────────────────────────── */}
+      <section className="bg-neutral-50 py-16 border-y border-neutral-200">
+        <div className="container-custom">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+            <div>
+              <h2 className="section-title">Featured Local Entrepreneurs</h2>
+              <p className="section-subtitle">Meet verified local craftspeople, master artisans, and technicians.</p>
+            </div>
+            <Link to="/entrepreneurs" className="text-sm font-semibold text-primary-600 hover:text-primary-700 no-underline flex items-center gap-1">
+              View All Entrepreneurs →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {ENTREPRENEURS.slice(0, 3).map((entrepreneur) => (
+              <EntrepreneurCard key={entrepreneur.id} entrepreneur={entrepreneur} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 4. POPULAR PRODUCTS ─────────────────────────────── */}
+      <section className="container-custom">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+          <div>
+            <h2 className="section-title">Handcrafted Products</h2>
+            <p className="section-subtitle">Directly buy authentic handmade goods from home creators.</p>
+          </div>
+          <Link to="/products" className="text-sm font-semibold text-primary-600 hover:text-primary-700 no-underline flex items-center gap-1">
+            Browse Products →
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {PRODUCTS.slice(0, 3).map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
+
+      {/* ── 5. POPULAR SERVICES ─────────────────────────────── */}
+      <section className="bg-neutral-50 py-16 border-y border-neutral-200">
+        <div className="container-custom">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+            <div>
+              <h2 className="section-title">Popular Local Services</h2>
+              <p className="section-subtitle">Book reliable doorstep repair, tailoring, and catering experts.</p>
+            </div>
+            <Link to="/services" className="text-sm font-semibold text-secondary-600 hover:text-secondary-700 no-underline flex items-center gap-1">
+              Browse Services →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {SERVICES.slice(0, 3).map((service) => (
+              <ServiceCard key={service.id} service={service} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6. HOW HUNARHUB WORKS ───────────────────────────── */}
+      <section className="container-custom py-8">
+        <div className="text-center mb-14">
+          <h2 className="section-title">How HunarHub Works</h2>
+          <p className="section-subtitle max-w-2xl mx-auto">
+            A seamless journey to empower micro-entrepreneurs and connect customers with verified local talent.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {[
+            {
+              step: '01',
+              title: '1. Discover',
+              desc: 'Browse categories or search for specific local products, handcrafts, or home services.',
+              icon: '🔍',
+            },
+            {
+              step: '02',
+              title: '2. Explore',
+              desc: 'Inspect entrepreneur profiles, customer ratings, portfolios, and price listings.',
+              icon: '📄',
+            },
+            {
+              step: '03',
+              title: '3. Order / Request',
+              desc: 'Place direct orders for products or schedule service visits with local artisans.',
+              icon: '🤝',
+            },
+            {
+              step: '04',
+              title: '4. Review & Support',
+              desc: 'Leave honest ratings and reviews to help build trust for micro-entrepreneurs.',
+              icon: '⭐',
+            },
+          ].map((item) => (
+            <div key={item.step} className="card text-center flex flex-col items-center hover:shadow-card-hover transition-all">
+              <div className="w-14 h-14 rounded-2xl bg-primary-100 text-primary-600 font-heading font-bold text-xl flex items-center justify-center mb-4">
+                {item.icon}
+              </div>
+              <h3 className="text-base font-heading font-semibold text-neutral-900">{item.title}</h3>
+              <p className="mt-2 text-xs text-neutral-600 leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 7. CALL TO ACTION FOR ENTREPRENEURS ──────────────── */}
+      <section className="container-custom">
+        <div className="bg-gradient-to-r from-primary-600 via-primary-500 to-secondary-600 rounded-3xl p-8 sm:p-14 text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-8">
+          <div className="max-w-2xl">
+            <span className="bg-white/20 text-white text-xs font-semibold px-3.5 py-1 rounded-full uppercase tracking-wider">
+              For Artisans & Technicians
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-heading font-bold mt-4">
+              Are you a local craftsperson or service provider?
+            </h2>
+            <p className="mt-3 text-neutral-100 text-sm sm:text-base leading-relaxed">
+              Join hundreds of local entrepreneurs on HunarHub. Create your digital storefront, get discovered by neighborhood customers, and manage your orders effortlessly.
+            </p>
+          </div>
+          <div className="flex-shrink-0 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <Link to="/entrepreneur" className="btn bg-white text-primary-600 hover:bg-neutral-100 text-sm font-semibold px-8 py-3.5 text-center no-underline">
+              Open Your Storefront
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
 
