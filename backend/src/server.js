@@ -8,7 +8,7 @@
 require('dotenv').config();
 
 const validateEnv = require('./config/env');
-const connectDB = require('./config/database');
+const { connectDB, disconnectDB } = require('./config/database');
 const app = require('./app');
 
 // ── Validate environment configuration ────────────────────────
@@ -29,8 +29,9 @@ const server = app.listen(PORT, () => {
 // ── Graceful shutdown ─────────────────────────────────────────
 const shutdown = (signal) => {
   console.log(`\n[SERVER] Received ${signal}. Shutting down gracefully…`);
-  server.close(() => {
+  server.close(async () => {
     console.log('[SERVER] HTTP server closed.');
+    await disconnectDB();
     process.exit(0);
   });
 };
