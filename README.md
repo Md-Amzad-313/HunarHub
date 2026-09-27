@@ -30,7 +30,7 @@ Many skilled local micro-entrepreneurs — artisans, craftspeople, home-based se
 ```
 HunarHub/
 │
-├── client/                  # React + Vite + Tailwind frontend
+├── frontend/                # React + Vite + Tailwind frontend
 │   ├── src/
 │   │   ├── components/      # Reusable UI components (Navbar, Footer, …)
 │   │   ├── pages/           # Route-level page components
@@ -47,7 +47,7 @@ HunarHub/
 │   ├── tailwind.config.js
 │   └── package.json
 │
-├── server/                  # Node.js + Express backend
+├── backend/                 # Node.js + Express backend
 │   ├── src/
 │   │   ├── config/          # DB connection, env validation
 │   │   ├── controllers/     # Route handler functions
@@ -101,7 +101,7 @@ cd hunarhub
 ### 2. Backend Setup
 
 ```bash
-cd server
+cd backend
 npm install
 cp .env.example .env
 # Edit .env and set MONGODB_URI, JWT_SECRET, etc.
@@ -112,7 +112,7 @@ cp .env.example .env
 ### 3. Frontend Setup
 
 ```bash
-cd client
+cd frontend
 npm install
 cp .env.example .env
 # Edit .env if needed (VITE_API_BASE_URL)
@@ -142,7 +142,7 @@ cp .env.example .env
 
 ## Environment Variables
 
-### Backend (`server/.env`)
+### Backend (`backend/.env`)
 
 | Variable        | Description                        | Example                          |
 |-----------------|------------------------------------|----------------------------------|
@@ -154,7 +154,7 @@ cp .env.example .env
 | `CLIENT_URL`    | Allowed CORS origin                | `http://localhost:5173`          |
 | `AI_SERVICE_URL`| Python AI service URL              | `http://localhost:8000`          |
 
-### Frontend (`client/.env`)
+### Frontend (`frontend/.env`)
 
 | Variable            | Description         | Example  |
 |---------------------|---------------------|----------|
@@ -176,7 +176,7 @@ cp .env.example .env
 ### Start the Backend
 
 ```bash
-cd server
+cd backend
 npm run dev
 # → http://localhost:5000
 # → http://localhost:5000/api/health
@@ -185,7 +185,7 @@ npm run dev
 ### Start the Frontend
 
 ```bash
-cd client
+cd frontend
 npm run dev
 # → http://localhost:5173
 ```

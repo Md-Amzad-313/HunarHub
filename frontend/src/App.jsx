@@ -41,9 +41,12 @@ import AdminOrders from './pages/Admin/AdminOrders';
 import AdminComplaints from './pages/Admin/AdminComplaints';
 import AdminAnalytics from './pages/Admin/AdminAnalytics';
 
+import ScrollToTop from './components/common/ScrollToTop';
+
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* ── Public Marketplace Routes ──────────────────────── */}
         <Route element={<MainLayout />}>
