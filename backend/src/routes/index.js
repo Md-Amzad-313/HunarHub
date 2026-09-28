@@ -6,14 +6,17 @@
 
 const express = require('express');
 const healthRoutes = require('./health.routes');
+const authRoutes = require('./auth.routes');
 
 const router = express.Router();
 
-// ── Phase 0 ─────────────────────────────────────────────────
+// ── Phase 0: Health Check ────────────────────────────────────
 router.use('/health', healthRoutes);
 
-// ── Phase 1+ (placeholders, uncomment as implemented) ────────
-// router.use('/auth',     require('./auth.routes'));
+// ── Phase 3.5: Authentication & Authorization ────────────────
+router.use('/auth', authRoutes);
+
+// ── Later Phases (placeholders, uncomment as implemented) ────
 // router.use('/users',   require('./users.routes'));
 // router.use('/products',require('./products.routes'));
 // router.use('/orders',  require('./orders.routes'));
