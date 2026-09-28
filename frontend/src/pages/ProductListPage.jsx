@@ -1,43 +1,53 @@
 import React, { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../components/common/PageHeader';
 import SearchBar from '../components/common/SearchBar';
 import ProductCard from '../components/cards/ProductCard';
 import { EmptyState } from '../components/common/States';
-import { PRODUCTS } from '../data/products';
+import { useMarketplace } from '../context/MarketplaceContext';
 import { CATEGORIES } from '../data/categories';
 
 function ProductListPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchParams] = useSearchParams();
+  const { products } = useMarketplace();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
 
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((p) => {
+    return products.filter((p) => {
+      const q = searchQuery.toLowerCase().trim();
       const matchesCategory =
-        selectedCategory === 'all' || p.categoryId === selectedCategory;
+        selectedCategory === 'all' ||
+        p.category?.toLowerCase() === selectedCategory.toLowerCase() ||
+        p.categoryId === selectedCategory;
+
       const matchesSearch =
-        !searchQuery ||
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchQuery.toLowerCase());
+        !q ||
+        p.name.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        (p.tags && p.tags.some((t) => t.toLowerCase().includes(q))) ||
+        (p.businessName && p.businessName.toLowerCase().includes(q));
+
       return matchesCategory && matchesSearch;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [products, searchQuery, selectedCategory]);
 
   return (
     <div className="space-y-8 pb-16">
       <PageHeader
         title="Handcrafted Products"
-        subtitle="Buy direct from home-based creators, traditional artisans, and local craftsmen."
+        subtitle="Buy direct from verified home-based creators, traditional artisans, and local craftsmen."
         breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Products' }]}
       />
 
       <div className="container-custom">
-        <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm space-y-4 mb-8">
+        <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm space-y-4 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-grow">
               <SearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
-                placeholder="Search products..."
+                placeholder="Search products by craft, material, or keyword..."
                 buttonLabel=""
               />
             </div>
@@ -47,9 +57,9 @@ function ProductListPage() {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full py-3 px-4 bg-neutral-50 border border-neutral-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
-                <option value="all">All Categories</option>
+                <option value="all">All Categories ({products.length})</option>
                 {CATEGORIES.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
+                  <option key={cat.id} value={cat.name}>
                     {cat.name}
                   </option>
                 ))}

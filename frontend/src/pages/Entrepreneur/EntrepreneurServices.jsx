@@ -2,32 +2,46 @@ import React, { useState } from 'react';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Input from '../../components/common/Input';
-import { SERVICES } from '../../data/services';
+import { useMarketplace } from '../../context/MarketplaceContext';
 import { formatCurrency } from '../../utils/helpers';
+import { CATEGORIES } from '../../data/categories';
 
 function EntrepreneurServices() {
-  const [servicesList, setServicesList] = useState(SERVICES);
+  const { services, addService, deleteService } = useMarketplace();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newService, setNewService] = useState({ name: '', price: '', category: 'Doorstep Repair & Fitting', description: '' });
+  const [newService, setNewService] = useState({
+    name: '',
+    price: '',
+    category: 'Cobbler',
+    description: '',
+    duration: '1 - 2 days',
+  });
 
   const handleAddService = (e) => {
     e.preventDefault();
-    const created = {
-      id: `serv-${Date.now()}`,
-      name: newService.name || 'Custom Home Fitting Service',
-      price: Number(newService.price) || 1500,
+    if (!newService.name || !newService.price) return;
+
+    const matchedCat = CATEGORIES.find((c) => c.name === newService.category);
+
+    addService({
+      name: newService.name,
+      price: Number(newService.price),
       category: newService.category,
-      rating: 5.0,
-      reviewCount: 0,
-      location: 'Multan, Punjab',
-      image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80',
-      description: newService.description || 'Professional home doorstep service by verified local technician.',
+      categoryId: matchedCat?.id || 'cat-3',
+      description:
+        newService.description || 'Professional craftsmanship and doorstep service by local artisan.',
+      duration: newService.duration || '1 - 2 days',
       availability: 'Available Today',
-      businessName: 'Tariq Craft & Repair Studio',
-    };
-    setServicesList([created, ...servicesList]);
+    });
+
     setIsModalOpen(false);
-    setNewService({ name: '', price: '', category: 'Doorstep Repair & Fitting', description: '' });
+    setNewService({
+      name: '',
+      price: '',
+      category: 'Cobbler',
+      description: '',
+      duration: '1 - 2 days',
+    });
   };
 
   return (
@@ -56,7 +70,7 @@ function EntrepreneurServices() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
-              {servicesList.map((serv) => (
+              {services.map((serv) => (
                 <tr key={serv.id} className="hover:bg-neutral-50 transition-colors">
                   <td className="px-6 py-4 font-semibold text-neutral-900 flex items-center gap-3">
                     <img src={serv.image} alt={serv.name} className="w-9 h-9 rounded-xl object-cover" />
@@ -70,10 +84,21 @@ function EntrepreneurServices() {
                       {serv.availability}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <button className="text-secondary-600 font-semibold hover:underline mr-3">Edit</button>
+                  <td className="px-6 py-4 text-right space-x-3">
+                    <a
+                      href={`/services/${serv.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-secondary-600 font-semibold hover:underline"
+                    >
+                      View
+                    </a>
                     <button
-                      onClick={() => setServicesList(servicesList.filter((s) => s.id !== serv.id))}
+                      onClick={() => {
+                        if (window.confirm(`Remove service "${serv.name}"?`)) {
+                          deleteService(serv.id);
+                        }
+                      }}
                       className="text-red-600 font-semibold hover:underline"
                     >
                       Delete
@@ -107,7 +132,7 @@ function EntrepreneurServices() {
             required
           />
           <Input
-            label="Service Fee (PKR)"
+            label="Service Fee (₹)"
             type="number"
             placeholder="1500"
             value={newService.price}
@@ -121,9 +146,11 @@ function EntrepreneurServices() {
               onChange={(e) => setNewService({ ...newService, category: e.target.value })}
               className="w-full rounded-xl border border-neutral-300 p-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-secondary-200"
             >
-              <option value="Doorstep Repair & Fitting">Doorstep Repair & Fitting</option>
-              <option value="Tailoring & Alterations">Tailoring & Alterations</option>
-              <option value="Craft Lessons & Workshops">Craft Lessons & Workshops</option>
+              {CATEGORIES.map((cat) => (
+                <option key={cat.id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="w-full flex flex-col gap-1.5">
@@ -143,3 +170,4 @@ function EntrepreneurServices() {
 }
 
 export default EntrepreneurServices;
+

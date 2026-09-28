@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import Modal from './common/Modal';
 import Button from './common/Button';
+import { useMarketplace } from '../context/MarketplaceContext';
 
 const NAV_LINKS = [
   { label: 'Home', to: '/' },
@@ -16,6 +17,7 @@ function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [portalMenuOpen, setPortalMenuOpen] = useState(false);
   const [authModal, setAuthModal] = useState(null); // 'signin' | 'register' | null
+  const { cartCount } = useMarketplace();
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-xs border-b border-neutral-200">
@@ -49,6 +51,20 @@ function Navbar() {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-3">
+            {/* Cart Icon & Badge */}
+            <Link
+              to="/cart"
+              className="relative p-2 text-neutral-700 hover:text-primary-600 hover:bg-neutral-100 rounded-xl transition-colors no-underline flex items-center gap-1.5"
+              title="View Shopping Cart"
+            >
+              <span className="text-lg">🛒</span>
+              {cartCount > 0 && (
+                <span className="bg-primary-500 text-white text-[11px] font-bold px-1.5 py-0.2 rounded-full min-w-[20px] text-center shadow-sm">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
             {/* Quick Portals Dropdown */}
             <div className="relative">
               <button
@@ -108,21 +124,36 @@ function Navbar() {
             </button>
           </div>
 
-          {/* Mobile Hamburger Button */}
-          <button
-            aria-label="Toggle navigation menu"
-            aria-expanded={mobileOpen}
-            className="lg:hidden p-2 rounded-xl text-neutral-700 hover:bg-neutral-100 transition-colors"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {mobileOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          {/* Mobile Hamburger Button & Cart */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <Link
+              to="/cart"
+              className="relative p-2 text-neutral-700 hover:text-primary-600 rounded-xl"
+              title="View Cart"
+            >
+              <span className="text-xl">🛒</span>
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary-500 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full min-w-[18px] text-center">
+                  {cartCount}
+                </span>
               )}
-            </svg>
-          </button>
+            </Link>
+
+            <button
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileOpen}
+              className="p-2 rounded-xl text-neutral-700 hover:bg-neutral-100 transition-colors"
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {mobileOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Mobile Dropdown Menu */}
@@ -144,6 +175,17 @@ function Navbar() {
                 {label}
               </NavLink>
             ))}
+
+            <Link
+              to="/cart"
+              onClick={() => setMobileOpen(false)}
+              className="text-sm font-medium px-3 py-2 rounded-xl transition-colors no-underline text-neutral-700 hover:bg-neutral-50 flex items-center justify-between"
+            >
+              <span>Shopping Cart</span>
+              <span className="bg-primary-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                {cartCount}
+              </span>
+            </Link>
 
             <div className="pt-3 mt-2 border-t border-neutral-100 flex flex-col gap-2">
               <span className="text-[11px] font-bold uppercase text-neutral-400 px-3">Quick Dashboards</span>

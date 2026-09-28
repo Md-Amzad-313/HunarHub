@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { ENTREPRENEURS } from '../../data/entrepreneurs';
+import { useMarketplace } from '../../context/MarketplaceContext';
 
 function AdminEntrepreneurs() {
-  const [entrepreneurs, setEntrepreneurs] = useState(
-    ENTREPRENEURS.map((e, index) => ({
+  const { entrepreneurs: marketplaceEntrepreneurs } = useMarketplace();
+  const [entrepreneursList, setEntrepreneursList] = useState(() =>
+    marketplaceEntrepreneurs.map((e, index) => ({
       ...e,
       verificationStatus: index === 3 ? 'Pending Review' : 'Verified',
     }))
   );
 
   const handleVerificationChange = (id, status) => {
-    setEntrepreneurs(
-      entrepreneurs.map((e) => (e.id === id ? { ...e, verificationStatus: status } : e))
+    setEntrepreneursList((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, verificationStatus: status } : e))
     );
   };
 
@@ -37,7 +38,7 @@ function AdminEntrepreneurs() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
-              {entrepreneurs.map((ent) => (
+              {entrepreneursList.map((ent) => (
                 <tr key={ent.id} className="hover:bg-neutral-50 transition-colors">
                   <td className="px-6 py-4 font-semibold text-neutral-900 flex items-center gap-3">
                     <img src={ent.avatar} alt={ent.name} className="w-8 h-8 rounded-full object-cover" />

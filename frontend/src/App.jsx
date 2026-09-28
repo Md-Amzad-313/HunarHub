@@ -15,6 +15,7 @@ import ServiceListPage from './pages/ServiceListPage';
 import ServiceDetailPage from './pages/ServiceDetailPage';
 import EntrepreneurListPage from './pages/EntrepreneurListPage';
 import EntrepreneurDetailPage from './pages/EntrepreneurDetailPage';
+import CartPage from './pages/CartPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Customer Pages
@@ -42,59 +43,65 @@ import AdminComplaints from './pages/Admin/AdminComplaints';
 import AdminAnalytics from './pages/Admin/AdminAnalytics';
 
 import ScrollToTop from './components/common/ScrollToTop';
+import { MarketplaceProvider } from './context/MarketplaceContext';
+import ToastContainer from './components/common/ToastContainer';
 
 function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <Routes>
-        {/* ── Public Marketplace Routes ──────────────────────── */}
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/explore" element={<ExplorePage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
-          <Route path="/products" element={<ProductListPage />} />
-          <Route path="/products/:id" element={<ProductDetailPage />} />
-          <Route path="/services" element={<ServiceListPage />} />
-          <Route path="/services/:id" element={<ServiceDetailPage />} />
-          <Route path="/entrepreneurs" element={<EntrepreneurListPage />} />
-          <Route path="/entrepreneurs/:id" element={<EntrepreneurDetailPage />} />
-        </Route>
+    <MarketplaceProvider>
+      <Router>
+        <ScrollToTop />
+        <ToastContainer />
+        <Routes>
+          {/* ── Public Marketplace Routes ──────────────────────── */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/products" element={<ProductListPage />} />
+            <Route path="/products/:id" element={<ProductDetailPage />} />
+            <Route path="/services" element={<ServiceListPage />} />
+            <Route path="/services/:id" element={<ServiceDetailPage />} />
+            <Route path="/entrepreneurs" element={<EntrepreneurListPage />} />
+            <Route path="/entrepreneurs/:id" element={<EntrepreneurDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+          </Route>
 
-        {/* ── Customer Portal Routes ───────────────────────────── */}
-        <Route path="/customer" element={<DashboardLayout role="customer" title="Customer Portal" />}>
-          <Route index element={<CustomerOverview />} />
-          <Route path="profile" element={<CustomerProfile />} />
-          <Route path="orders" element={<CustomerOrders />} />
-          <Route path="requests" element={<CustomerRequests />} />
-          <Route path="recommendations" element={<CustomerRecommendations />} />
-        </Route>
+          {/* ── Customer Portal Routes ───────────────────────────── */}
+          <Route path="/customer" element={<DashboardLayout role="customer" title="Customer Portal" />}>
+            <Route index element={<CustomerOverview />} />
+            <Route path="profile" element={<CustomerProfile />} />
+            <Route path="orders" element={<CustomerOrders />} />
+            <Route path="requests" element={<CustomerRequests />} />
+            <Route path="recommendations" element={<CustomerRecommendations />} />
+          </Route>
 
-        {/* ── Entrepreneur Portal Routes ───────────────────────── */}
-        <Route path="/entrepreneur" element={<DashboardLayout role="entrepreneur" title="Entrepreneur Studio" />}>
-          <Route index element={<EntrepreneurOverview />} />
-          <Route path="profile" element={<EntrepreneurProfile />} />
-          <Route path="products" element={<EntrepreneurProducts />} />
-          <Route path="services" element={<EntrepreneurServices />} />
-          <Route path="orders" element={<EntrepreneurOrders />} />
-          <Route path="requests" element={<EntrepreneurRequests />} />
-        </Route>
+          {/* ── Entrepreneur Portal Routes ───────────────────────── */}
+          <Route path="/entrepreneur" element={<DashboardLayout role="entrepreneur" title="Entrepreneur Studio" />}>
+            <Route index element={<EntrepreneurOverview />} />
+            <Route path="profile" element={<EntrepreneurProfile />} />
+            <Route path="products" element={<EntrepreneurProducts />} />
+            <Route path="services" element={<EntrepreneurServices />} />
+            <Route path="orders" element={<EntrepreneurOrders />} />
+            <Route path="requests" element={<EntrepreneurRequests />} />
+          </Route>
 
-        {/* ── Admin Control Center Routes ──────────────────────── */}
-        <Route path="/admin" element={<DashboardLayout role="admin" title="Admin Control Center" />}>
-          <Route index element={<AdminOverview />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="entrepreneurs" element={<AdminEntrepreneurs />} />
-          <Route path="categories" element={<AdminCategories />} />
-          <Route path="orders" element={<AdminOrders />} />
-          <Route path="complaints" element={<AdminComplaints />} />
-          <Route path="analytics" element={<AdminAnalytics />} />
-        </Route>
+          {/* ── Admin Control Center Routes ──────────────────────── */}
+          <Route path="/admin" element={<DashboardLayout role="admin" title="Admin Control Center" />}>
+            <Route index element={<AdminOverview />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="entrepreneurs" element={<AdminEntrepreneurs />} />
+            <Route path="categories" element={<AdminCategories />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="complaints" element={<AdminComplaints />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+          </Route>
 
-        {/* ── 404 Fallback ────────────────────────────────────── */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </Router>
+          {/* ── 404 Fallback ────────────────────────────────────── */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Router>
+    </MarketplaceProvider>
   );
 }
 

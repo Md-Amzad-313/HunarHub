@@ -1,33 +1,31 @@
 import React, { useState } from 'react';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
+import { useMarketplace } from '../../context/MarketplaceContext';
 
 function CustomerProfile() {
-  const [formData, setFormData] = useState({
-    name: 'Fatima Ahmed',
-    email: 'fatima.ahmed@example.com',
-    phone: '+92 300 9876543',
-    city: 'Lahore',
-    address: 'Gulberg III, Lahore, Punjab',
-  });
+  const { customerProfile, updateCustomerProfile } = useMarketplace();
+  const [formData, setFormData] = useState(customerProfile);
   const [saved, setSaved] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    updateCustomerProfile(formData);
     setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    setTimeout(() => setSaved(false), 4000);
   };
 
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-heading font-bold text-neutral-900">Customer Profile Settings</h1>
-        <p className="text-xs text-neutral-500 mt-1">Manage your contact details and default delivery address.</p>
+        <h1 className="text-2xl font-heading font-bold text-neutral-900">Customer Profile & Settings</h1>
+        <p className="text-xs text-neutral-500 mt-1">Manage your contact details and default delivery address across HunarHub.</p>
       </div>
 
       {saved && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs font-semibold">
-          ✓ Profile settings updated successfully (UI Mockup).
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs font-semibold flex items-center justify-between">
+          <span>✓ Profile settings updated and stored to your browser profile.</span>
+          <button onClick={() => setSaved(false)} className="text-emerald-700 font-bold ml-2">✕</button>
         </div>
       )}
 
@@ -35,43 +33,47 @@ function CustomerProfile() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <Input
             label="Full Name"
-            value={formData.name}
+            value={formData.name || ''}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
           <Input
             label="Email Address"
             type="email"
-            value={formData.email}
+            value={formData.email || ''}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             required
           />
           <Input
             label="Phone Number"
-            value={formData.phone}
+            value={formData.phone || ''}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             required
           />
           <Input
             label="City"
-            value={formData.city}
+            value={formData.city || ''}
             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
             required
           />
         </div>
 
-        <div className="w-full flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-neutral-700">Delivery Address</label>
+        <div>
+          <label className="block text-xs font-medium text-neutral-700 mb-1">
+            Default Delivery Address
+          </label>
           <textarea
-            rows={3}
-            value={formData.address}
+            value={formData.address || ''}
             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-            className="w-full rounded-xl border border-neutral-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
+            rows={3}
+            className="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-200 resize-none"
+            placeholder="Complete street address..."
+            required
           />
         </div>
 
-        <div className="pt-4 border-t border-neutral-100 flex justify-end">
-          <Button type="submit" variant="primary" size="md">
+        <div className="pt-2 flex justify-end">
+          <Button variant="primary" size="md" type="submit">
             Save Changes
           </Button>
         </div>

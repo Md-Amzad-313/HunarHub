@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
-import { ENTREPRENEURS } from '../../data/entrepreneurs';
+import { useMarketplace } from '../../context/MarketplaceContext';
 
 function EntrepreneurProfile() {
-  const current = ENTREPRENEURS[1];
+  const { currentEntrepreneurId, getEntrepreneurById, setCurrentEntrepreneurId, entrepreneurs } = useMarketplace();
+  const current = getEntrepreneurById(currentEntrepreneurId) || entrepreneurs[0];
+
   const [formData, setFormData] = useState({
-    name: current.name,
-    businessName: current.businessName,
-    category: current.category,
-    location: current.location,
-    phone: current.phone,
-    email: current.email,
-    about: current.about,
+    name: current?.name || '',
+    businessName: current?.businessName || '',
+    category: current?.category || 'Potter',
+    location: current?.location || 'Jaipur',
+    phone: current?.phoneDisplay || '+91 94140 11223',
+    email: current?.email || 'artisan@hunarhub.local',
+    about: current?.about || current?.description || '',
   });
   const [saved, setSaved] = useState(false);
 
@@ -24,14 +26,48 @@ function EntrepreneurProfile() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div>
-        <h1 className="text-2xl font-heading font-bold text-neutral-900">Storefront & Profile Settings</h1>
-        <p className="text-xs text-neutral-500 mt-1">Update public business description, contact information, and service area.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-heading font-bold text-neutral-900">Storefront & Profile Settings</h1>
+          <p className="text-xs text-neutral-500 mt-1">
+            Update public business description, contact information, and service area.
+          </p>
+        </div>
+
+        {/* Switch Active Entrepreneur for Demo */}
+        <div className="flex items-center gap-2">
+          <label className="text-xs font-semibold text-neutral-600 whitespace-nowrap">Active Artisan:</label>
+          <select
+            value={currentEntrepreneurId}
+            onChange={(e) => {
+              setCurrentEntrepreneurId(e.target.value);
+              const ent = getEntrepreneurById(e.target.value);
+              if (ent) {
+                setFormData({
+                  name: ent.name,
+                  businessName: ent.businessName,
+                  category: ent.category,
+                  location: ent.location,
+                  phone: ent.phoneDisplay || '+91 98000 11223',
+                  email: ent.email || 'artisan@hunarhub.local',
+                  about: ent.about || ent.description,
+                });
+              }
+            }}
+            className="py-1.5 px-3 bg-white border border-neutral-300 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-primary-200"
+          >
+            {entrepreneurs.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.name} ({e.category})
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {saved && (
         <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs font-semibold">
-          ✓ Storefront profile updated successfully (UI Mockup).
+          ✓ Storefront profile updated successfully in prototype session.
         </div>
       )}
 
@@ -68,27 +104,34 @@ function EntrepreneurProfile() {
             onChange={(e) => setFormData({ ...formData, location: e.target.value })}
             required
           />
-          <Input
-            label="Primary Skill Category"
-            value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          <div>
+            <label className="block text-xs font-medium text-neutral-700 mb-1">Craft Category</label>
+            <input
+              type="text"
+              value={formData.category}
+              disabled
+              className="w-full py-2.5 px-3 bg-neutral-100 border border-neutral-200 rounded-xl text-xs font-medium text-neutral-600"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-neutral-700 mb-1">
+            Storefront Bio & Traditional Craft Story
+          </label>
+          <textarea
+            value={formData.about}
+            onChange={(e) => setFormData({ ...formData, about: e.target.value })}
+            rows={4}
+            className="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-200 resize-none"
+            placeholder="Tell customers about your craftsmanship history and techniques..."
             required
           />
         </div>
 
-        <div className="w-full flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-neutral-700">Storefront Bio & Craft Story</label>
-          <textarea
-            rows={4}
-            value={formData.about}
-            onChange={(e) => setFormData({ ...formData, about: e.target.value })}
-            className="w-full rounded-xl border border-neutral-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
-          />
-        </div>
-
-        <div className="pt-4 border-t border-neutral-100 flex justify-end">
-          <Button type="submit" variant="primary" size="md">
-            Save Storefront Profile
+        <div className="pt-2 flex justify-end">
+          <Button variant="primary" size="md" type="submit">
+            Save Storefront Details
           </Button>
         </div>
       </form>

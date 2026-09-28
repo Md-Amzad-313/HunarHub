@@ -2,32 +2,51 @@ import React, { useState } from 'react';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Input from '../../components/common/Input';
-import { PRODUCTS } from '../../data/products';
+import { useMarketplace } from '../../context/MarketplaceContext';
 import { formatCurrency } from '../../utils/helpers';
+import { CATEGORIES } from '../../data/categories';
 
 function EntrepreneurProducts() {
-  const [productsList, setProductsList] = useState(PRODUCTS);
+  const { products, addProduct, deleteProduct } = useMarketplace();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', category: 'Pottery & Ceramics', description: '' });
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    price: '',
+    category: 'Potter',
+    description: '',
+    image: '',
+    location: 'Jaipur, Rajasthan',
+  });
 
   const handleAddProduct = (e) => {
     e.preventDefault();
-    const created = {
-      id: `prod-${Date.now()}`,
+    if (!newProduct.name || !newProduct.price) return;
+
+    const matchedCategory = CATEGORIES.find((c) => c.name === newProduct.category);
+
+    addProduct({
       name: newProduct.name,
-      price: Number(newProduct.price) || 1000,
+      price: Number(newProduct.price),
       category: newProduct.category,
-      rating: 5.0,
-      reviewCount: 0,
-      location: 'Multan, Punjab',
-      image: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=600&q=80',
-      description: newProduct.description,
-      availability: 'In Stock',
-      businessName: 'Clay Craft Pottery Studio',
-    };
-    setProductsList([created, ...productsList]);
+      categoryId: matchedCategory?.id || 'cat-2',
+      description:
+        newProduct.description ||
+        'Handcrafted artisanal item made using traditional techniques by local micro-entrepreneurs.',
+      image:
+        newProduct.image ||
+        'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=600&q=80',
+      location: newProduct.location || 'Jaipur, Rajasthan',
+    });
+
     setIsModalOpen(false);
-    setNewProduct({ name: '', price: '', category: 'Pottery & Ceramics', description: '' });
+    setNewProduct({
+      name: '',
+      price: '',
+      category: 'Potter',
+      description: '',
+      image: '',
+      location: 'Jaipur, Rajasthan',
+    });
   };
 
   return (
@@ -35,7 +54,9 @@ function EntrepreneurProducts() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-heading font-bold text-neutral-900">My Product Inventory</h1>
-          <p className="text-xs text-neutral-500 mt-1">Manage listings, prices, and stock availability for your storefront.</p>
+          <p className="text-xs text-neutral-500 mt-1">
+            Manage listings, prices, and stock availability for your storefront ({products.length} listed).
+          </p>
         </div>
         <Button variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
           + Add New Product
@@ -56,24 +77,35 @@ function EntrepreneurProducts() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100">
-              {productsList.map((prod) => (
-                <tr key={prod.id} className="hover:bg-neutral-50 transition-colors">
+              {products.map((prod) => (
+                <tr key={prod.id} className="hover:bg-neutral-50/80 transition-colors">
                   <td className="px-6 py-4 font-semibold text-neutral-900 flex items-center gap-3">
                     <img src={prod.image} alt={prod.name} className="w-9 h-9 rounded-xl object-cover" />
-                    <span>{prod.name}</span>
+                    <span className="line-clamp-1">{prod.name}</span>
                   </td>
                   <td className="px-6 py-4 text-neutral-500">{prod.category}</td>
                   <td className="px-6 py-4 font-bold text-neutral-900">{formatCurrency(prod.price)}</td>
                   <td className="px-6 py-4 font-semibold text-amber-600">{prod.rating} ★</td>
                   <td className="px-6 py-4">
                     <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
-                      {prod.availability}
+                      {prod.availability || 'In Stock'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <button className="text-primary-600 font-semibold hover:underline mr-3">Edit</button>
+                  <td className="px-6 py-4 text-right space-x-3">
+                    <a
+                      href={`/products/${prod.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary-600 font-semibold hover:underline"
+                    >
+                      View
+                    </a>
                     <button
-                      onClick={() => setProductsList(productsList.filter((p) => p.id !== prod.id))}
+                      onClick={() => {
+                        if (window.confirm(`Delete product "${prod.name}"?`)) {
+                          deleteProduct(prod.id);
+                        }
+                      }}
                       className="text-red-600 font-semibold hover:underline"
                     >
                       Delete
@@ -86,15 +118,19 @@ function EntrepreneurProducts() {
         </div>
       </div>
 
-      {/* Add Product Modal (UI Mockup) */}
+      {/* Add Product Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add Product Listing"
+        title="Add New Product to Store"
         footer={
           <>
-            <Button variant="outline" size="sm" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-            <Button variant="primary" size="sm" onClick={handleAddProduct}>Save Listing</Button>
+            <Button variant="outline" size="sm" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" size="sm" onClick={handleAddProduct}>
+              Publish Product
+            </Button>
           </>
         }
       >
@@ -103,25 +139,57 @@ function EntrepreneurProducts() {
             label="Product Title"
             value={newProduct.name}
             onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-            placeholder="e.g. Handcrafted Clay Vase"
+            placeholder="e.g. Handmade Terracotta Planter"
             required
           />
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Price (₹)"
+              type="number"
+              value={newProduct.price}
+              onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+              placeholder="e.g. 2500"
+              required
+            />
+            <div>
+              <label className="block text-xs font-medium text-neutral-700 mb-1">Category</label>
+              <select
+                value={newProduct.category}
+                onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                className="w-full py-2.5 px-3 bg-white border border-neutral-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-200"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat.id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <Input
-            label="Price (PKR)"
-            type="number"
-            value={newProduct.price}
-            onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-            placeholder="2500"
-            required
+            label="Image URL (Optional)"
+            value={newProduct.image}
+            onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
+            placeholder="https://images.unsplash.com/..."
           />
-          <div className="w-full flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-neutral-700">Description</label>
+
+          <Input
+            label="Crafting Location"
+            value={newProduct.location}
+            onChange={(e) => setNewProduct({ ...newProduct, location: e.target.value })}
+            placeholder="e.g. Multan, Punjab"
+          />
+
+          <div>
+            <label className="block text-xs font-medium text-neutral-700 mb-1">Description & Crafting Details</label>
             <textarea
               rows={3}
               value={newProduct.description}
               onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-              className="w-full rounded-xl border border-neutral-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
-              placeholder="Describe craftsmanship details..."
+              placeholder="Describe materials used, dimensions, and artisan backstory..."
+              className="w-full p-3 bg-white border border-neutral-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary-200 resize-none"
             />
           </div>
         </form>

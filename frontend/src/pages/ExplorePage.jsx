@@ -8,15 +8,14 @@ import ServiceCard from '../components/cards/ServiceCard';
 import EntrepreneurCard from '../components/cards/EntrepreneurCard';
 import { EmptyState } from '../components/common/States';
 
-import { PRODUCTS } from '../data/products';
-import { SERVICES } from '../data/services';
-import { ENTREPRENEURS } from '../data/entrepreneurs';
+import { useMarketplace } from '../context/MarketplaceContext';
 import { CATEGORIES } from '../data/categories';
 
 function ExplorePage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { products, services, entrepreneurs } = useMarketplace();
 
-  // Filter states
+  // Filter states from URL query or defaults
   const initialCategory = searchParams.get('category') || 'all';
   const initialSearch = searchParams.get('search') || '';
 
@@ -27,67 +26,99 @@ function ExplorePage() {
   const [minRating, setMinRating] = useState(0);
   const [sortBy, setSortBy] = useState('rating'); // 'rating' | 'price-low' | 'price-high'
 
-  // Extract unique locations
+  // Extract unique locations from live context data
   const locations = useMemo(() => {
     const allLocs = [
-      ...PRODUCTS.map((p) => p.location),
-      ...SERVICES.map((s) => s.location),
-      ...ENTREPRENEURS.map((e) => e.location),
-    ];
+      ...products.map((p) => p.location),
+      ...services.map((s) => s.location),
+      ...entrepreneurs.map((e) => e.location),
+    ].filter(Boolean);
     return Array.from(new Set(allLocs));
-  }, []);
+  }, [products, services, entrepreneurs]);
 
-  // Filtered lists
+  // Match category helper (handles slug, name, or category string)
+  const isCategoryMatch = (entityCategory, targetCategory) => {
+    if (targetCategory === 'all') return true;
+    const normTarget = targetCategory.toLowerCase().replace(/[-_&]/g, ' ');
+    const normEntity = (entityCategory || '').toLowerCase().replace(/[-_&]/g, ' ');
+    return (
+      normEntity.includes(normTarget) ||
+      normTarget.includes(normEntity) ||
+      (targetCategory === 'tailor' && normEntity.includes('tailor')) ||
+      (targetCategory === 'potter' && (normEntity.includes('potter') || normEntity.includes('ceramic'))) ||
+      (targetCategory === 'cobbler' && (normEntity.includes('cobbler') || normEntity.includes('leather'))) ||
+      (targetCategory === 'artisan' && normEntity.includes('artisan')) ||
+      (targetCategory === 'handicraft-maker' && (normEntity.includes('handicraft') || normEntity.includes('maker'))) ||
+      (targetCategory === 'small-vendor' && (normEntity.includes('vendor') || normEntity.includes('bakes') || normEntity.includes('spices')))
+    );
+  };
+
+  // Filtered products
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((p) => {
-      const matchesCategory =
-        selectedCategory === 'all' || p.categoryId === selectedCategory || p.category.toLowerCase().includes(selectedCategory.toLowerCase());
-      const matchesSearch =
-        !searchQuery ||
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesLocation = locationFilter === 'all' || p.location === locationFilter;
-      const matchesRating = p.rating >= minRating;
-      return matchesCategory && matchesSearch && matchesLocation && matchesRating;
-    }).sort((a, b) => {
-      if (sortBy === 'price-low') return a.price - b.price;
-      if (sortBy === 'price-high') return b.price - a.price;
-      return b.rating - a.rating;
-    });
-  }, [selectedCategory, searchQuery, locationFilter, minRating, sortBy]);
+    return products
+      .filter((p) => {
+        const matchesCategory = isCategoryMatch(p.category, selectedCategory);
+        const q = searchQuery.toLowerCase().trim();
+        const matchesSearch =
+          !q ||
+          p.name.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q) ||
+          (p.tags && p.tags.some((t) => t.toLowerCase().includes(q))) ||
+          (p.businessName && p.businessName.toLowerCase().includes(q));
+        const matchesLocation = locationFilter === 'all' || p.location === locationFilter;
+        const matchesRating = p.rating >= minRating;
+        return matchesCategory && matchesSearch && matchesLocation && matchesRating;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'price-low') return a.price - b.price;
+        if (sortBy === 'price-high') return b.price - a.price;
+        return b.rating - a.rating;
+      });
+  }, [products, selectedCategory, searchQuery, locationFilter, minRating, sortBy]);
 
+  // Filtered services
   const filteredServices = useMemo(() => {
-    return SERVICES.filter((s) => {
-      const matchesCategory =
-        selectedCategory === 'all' || s.categoryId === selectedCategory || s.category.toLowerCase().includes(selectedCategory.toLowerCase());
-      const matchesSearch =
-        !searchQuery ||
-        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesLocation = locationFilter === 'all' || s.location === locationFilter;
-      const matchesRating = s.rating >= minRating;
-      return matchesCategory && matchesSearch && matchesLocation && matchesRating;
-    }).sort((a, b) => {
-      if (sortBy === 'price-low') return a.price - b.price;
-      if (sortBy === 'price-high') return b.price - a.price;
-      return b.rating - a.rating;
-    });
-  }, [selectedCategory, searchQuery, locationFilter, minRating, sortBy]);
+    return services
+      .filter((s) => {
+        const matchesCategory = isCategoryMatch(s.category, selectedCategory);
+        const q = searchQuery.toLowerCase().trim();
+        const matchesSearch =
+          !q ||
+          s.name.toLowerCase().includes(q) ||
+          s.description.toLowerCase().includes(q) ||
+          (s.skills && s.skills.some((sk) => sk.toLowerCase().includes(q))) ||
+          (s.tags && s.tags.some((t) => t.toLowerCase().includes(q))) ||
+          (s.businessName && s.businessName.toLowerCase().includes(q));
+        const matchesLocation = locationFilter === 'all' || s.location === locationFilter;
+        const matchesRating = s.rating >= minRating;
+        return matchesCategory && matchesSearch && matchesLocation && matchesRating;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'price-low') return a.price - b.price;
+        if (sortBy === 'price-high') return b.price - a.price;
+        return b.rating - a.rating;
+      });
+  }, [services, selectedCategory, searchQuery, locationFilter, minRating, sortBy]);
 
+  // Filtered entrepreneurs
   const filteredEntrepreneurs = useMemo(() => {
-    return ENTREPRENEURS.filter((e) => {
-      const matchesCategory =
-        selectedCategory === 'all' || e.category.toLowerCase().includes(selectedCategory.toLowerCase());
-      const matchesSearch =
-        !searchQuery ||
-        e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        e.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        e.about.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesLocation = locationFilter === 'all' || e.location === locationFilter;
-      const matchesRating = e.rating >= minRating;
-      return matchesCategory && matchesSearch && matchesLocation && matchesRating;
-    }).sort((a, b) => b.rating - a.rating);
-  }, [selectedCategory, searchQuery, locationFilter, minRating]);
+    return entrepreneurs
+      .filter((e) => {
+        const matchesCategory = isCategoryMatch(e.category, selectedCategory);
+        const q = searchQuery.toLowerCase().trim();
+        const matchesSearch =
+          !q ||
+          e.name.toLowerCase().includes(q) ||
+          e.businessName.toLowerCase().includes(q) ||
+          (e.skills && e.skills.some((sk) => sk.toLowerCase().includes(q))) ||
+          (e.about && e.about.toLowerCase().includes(q)) ||
+          (e.location && e.location.toLowerCase().includes(q));
+        const matchesLocation = locationFilter === 'all' || e.location === locationFilter;
+        const matchesRating = e.rating >= minRating;
+        return matchesCategory && matchesSearch && matchesLocation && matchesRating;
+      })
+      .sort((a, b) => b.rating - a.rating);
+  }, [entrepreneurs, selectedCategory, searchQuery, locationFilter, minRating]);
 
   const totalResults =
     (activeTab === 'all' || activeTab === 'products' ? filteredProducts.length : 0) +
@@ -113,7 +144,7 @@ function ExplorePage() {
 
       <div className="container-custom">
         {/* Top Search & Filter Bar */}
-        <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm space-y-4">
+        <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm space-y-4">
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
@@ -191,7 +222,7 @@ function ExplorePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-8 border-b border-neutral-200 pb-4">
           <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
             {[
-              { id: 'all', label: 'All Listings' },
+              { id: 'all', label: `All Listings (${filteredProducts.length + filteredServices.length + filteredEntrepreneurs.length})` },
               { id: 'products', label: `Products (${filteredProducts.length})` },
               { id: 'services', label: `Services (${filteredServices.length})` },
               { id: 'entrepreneurs', label: `Entrepreneurs (${filteredEntrepreneurs.length})` },
@@ -211,7 +242,7 @@ function ExplorePage() {
           </div>
 
           <div className="flex items-center justify-between sm:justify-end gap-4 text-xs text-neutral-500">
-            <span>Showing <strong>{totalResults}</strong> items</span>
+            <span>Showing <strong>{totalResults}</strong> matching results</span>
             {(selectedCategory !== 'all' || searchQuery || locationFilter !== 'all' || minRating > 0) && (
               <button
                 onClick={clearFilters}

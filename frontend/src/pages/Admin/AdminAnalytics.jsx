@@ -10,7 +10,7 @@ function AdminAnalytics() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <DashboardCard title="Monthly GMV" value="482,000 PKR" change="28%" icon="📈" color="emerald" />
+        <DashboardCard title="Monthly GMV" value="₹4,82,000" change="28%" icon="📈" color="emerald" />
         <DashboardCard title="New Signups (30d)" value="+142" change="15%" icon="👤" color="primary" />
         <DashboardCard title="Avg Rating" value="4.85 ★" icon="⭐" color="amber" />
         <DashboardCard title="Order Completion Rate" value="98.2%" icon="🎯" color="secondary" />

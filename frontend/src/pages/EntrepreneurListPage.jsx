@@ -1,44 +1,53 @@
 import React, { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../components/common/PageHeader';
 import SearchBar from '../components/common/SearchBar';
 import EntrepreneurCard from '../components/cards/EntrepreneurCard';
 import { EmptyState } from '../components/common/States';
-import { ENTREPRENEURS } from '../data/entrepreneurs';
+import { useMarketplace } from '../context/MarketplaceContext';
 import { CATEGORIES } from '../data/categories';
 
 function EntrepreneurListPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchParams] = useSearchParams();
+  const { entrepreneurs } = useMarketplace();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
 
   const filteredEntrepreneurs = useMemo(() => {
-    return ENTREPRENEURS.filter((e) => {
+    return entrepreneurs.filter((e) => {
+      const q = searchQuery.toLowerCase().trim();
       const matchesCategory =
-        selectedCategory === 'all' || e.category.toLowerCase().includes(selectedCategory.toLowerCase());
+        selectedCategory === 'all' ||
+        e.category?.toLowerCase() === selectedCategory.toLowerCase();
+
       const matchesSearch =
-        !searchQuery ||
-        e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        e.businessName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        e.about.toLowerCase().includes(searchQuery.toLowerCase());
+        !q ||
+        e.name.toLowerCase().includes(q) ||
+        e.businessName.toLowerCase().includes(q) ||
+        (e.about && e.about.toLowerCase().includes(q)) ||
+        (e.location && e.location.toLowerCase().includes(q)) ||
+        (e.skills && e.skills.some((sk) => sk.toLowerCase().includes(q)));
+
       return matchesCategory && matchesSearch;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [entrepreneurs, searchQuery, selectedCategory]);
 
   return (
     <div className="space-y-8 pb-16">
       <PageHeader
         title="Local Micro-Entrepreneurs"
-        subtitle="Discover verified artisans, local craftspeople, and skilled technicians."
+        subtitle="Discover verified cobblers, potters, tailors, artisans, handicraft makers, and small vendors."
         breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'Entrepreneurs' }]}
       />
 
       <div className="container-custom">
-        <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm space-y-4 mb-8">
+        <div className="bg-white p-6 rounded-3xl border border-neutral-200 shadow-sm space-y-4 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-grow">
               <SearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
-                placeholder="Search by name, business, or skill..."
+                placeholder="Search by artisan name, trade, location, or skill..."
                 buttonLabel=""
               />
             </div>
@@ -48,7 +57,7 @@ function EntrepreneurListPage() {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full py-3 px-4 bg-neutral-50 border border-neutral-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
               >
-                <option value="all">All Categories</option>
+                <option value="all">All Crafts ({entrepreneurs.length})</option>
                 {CATEGORIES.map((cat) => (
                   <option key={cat.id} value={cat.name}>
                     {cat.name}

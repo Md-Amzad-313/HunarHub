@@ -7,7 +7,7 @@ function CategoryCard({ category }) {
 
   return (
     <Link
-      to={`/explore?category=${slug}`}
+      to={`/explore?category=${slug || name.toLowerCase()}`}
       className="group card hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between no-underline overflow-hidden border border-neutral-200 hover:border-primary-300"
     >
       <div className="relative h-36 -mx-6 -mt-6 mb-4 overflow-hidden bg-neutral-100">
@@ -39,7 +39,9 @@ function CategoryCard({ category }) {
       </div>
 
       <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
-        <span className="font-semibold text-neutral-500">{itemCount} Listings</span>
+        <span className="font-semibold text-neutral-500">
+          {itemCount !== undefined ? `${itemCount} Listings` : 'Explore Listings'}
+        </span>
         <span className="text-primary-600 font-semibold group-hover:translate-x-1 transition-transform flex items-center gap-1">
           Browse →
         </span>

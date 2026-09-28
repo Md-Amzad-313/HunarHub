@@ -6,11 +6,20 @@
 /**
  * Format a number as a localised currency string.
  * @param {number} amount
- * @param {string} currency - ISO 4217 code, default 'PKR'
- * @param {string} locale   - BCP 47 locale, default 'en-PK'
+ * @param {string} currency - ISO 4217 code, default 'INR'
+ * @param {string} locale   - BCP 47 locale, default 'en-IN'
  */
-export const formatCurrency = (amount, currency = 'PKR', locale = 'en-PK') => {
-  return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount);
+export const formatCurrency = (amount, currency = 'INR', locale = 'en-IN') => {
+  const num = Number(amount) || 0;
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 0,
+    }).format(num);
+  } catch (e) {
+    return `₹${num.toLocaleString()}`;
+  }
 };
 
 /**
@@ -28,12 +37,16 @@ export const truncateText = (text, maxLength = 100) => {
  * @param {string|Date} date
  * @param {string}      locale
  */
-export const formatDate = (date, locale = 'en-PK') => {
-  return new Intl.DateTimeFormat(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(new Date(date));
+export const formatDate = (date, locale = 'en-IN') => {
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }).format(new Date(date));
+  } catch {
+    return String(date);
+  }
 };
 
 /**
